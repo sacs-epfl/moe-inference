@@ -3,12 +3,10 @@ cd ../src
 
 python3 start.py \
     --model_type "encoder-decoder" \
-    --schedule "deepspeed" \
     --batch_size 250 \
     --seq_len 120 \
     --num_experts 128 \
-    --max_loaded_experts 1000 \
-    --num_parallel_experts_per_GPU 0 \
+    --num_parallel_experts_per_GPU 1 \
     --num_iters 100 \
     --profile False \
     --nvidia_profile False \
@@ -17,7 +15,7 @@ python3 start.py \
     --enable_router_skew False \
     --router_skew 0.6 \
     --num_experts_skew 2 \
-    --expert_manager "sliced_fused_kernel" \
+    --expert_manager "MegaBlocks" \
     --path "../outputs/mgblcks/encoder-decoder_mgblcks_128_experts_4_gpus_normalrun_ec_50" \
     --label "Encoder-Decoder MegaBlocks 128 Experts" \
     --experiment_name "encoder-decoder_mgblcks_128_experts_4_gpus_normalrun_ec_50"
