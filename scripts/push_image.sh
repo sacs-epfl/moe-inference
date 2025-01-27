@@ -3,4 +3,4 @@
 cd ..
 
 docker login ic-registry.epfl.ch/sacs/aloureir/
-docker push ic-registry.epfl.ch/sacs/aloureir/moe:latest
+docker push ic-registry.epfl.ch/sacs/aloureir/moe-gitlab:latest
