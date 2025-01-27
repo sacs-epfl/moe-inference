@@ -15,5 +15,5 @@ docker build \
   --build-arg USER_NAME=$USER_NAME \
   --build-arg WORKSPACE=/mnt/nfs/home/aloureir/moe-inference/ \
   --build-arg CACHE=/mnt/nfs/home/aloureir/cache/ \
-  -t ic-registry.epfl.ch/sacs/aloureir/moe-deepspeed:latest \
-  -t moe-deepspeed:latest .
+  -t ic-registry.epfl.ch/sacs/aloureir/moe-deepspeed-gitlab:latest \
+  -t moe-deepspeed-gitlab:latest .

@@ -15,6 +15,9 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install system-wide packages
+
+RUN python3 -m pip install --upgrade pip
+
 RUN pip install \
     setuptools==75.6.0 \
     wheel==0.45.0 \
@@ -27,7 +30,10 @@ RUN pip install \
 RUN python3 -m pip install gurobipy==12.0.0
 
 RUN pip install -U kaleido==0.2.1
-RUN python3 -m pip install -v -U --no-build-isolation git+https://github.com/microsoft/tutel@c7559e8
+
+# RUN python3 -m pip install -v -U --no-build-isolation git+https://github.com/microsoft/tutel@c7559e8
+
+RUN python3 -m pip install -v -U --no-build-isolation git+https://github.com/microsoft/tutel.git
 
 # Install tmux and copy config
 RUN apt update && apt install tmux -y
