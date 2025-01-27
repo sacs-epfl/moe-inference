@@ -1,0 +1,22 @@
+{
+    "experiment_name": "encoder_deepspeed_128_experts_4_gpus_0.8_rs_90_cf",
+    "label": "Encoder DeepSpeed 128 Experts",
+    "start": 1735923505.6911063,
+    "end": 1735923706.78629,
+    "dataset": "bookcorpus",
+    "num_samples": 0,
+    "batch_size": 250,
+    "seq_len": 120,
+    "num_iters": 100,
+    "path": "../outputs/deepspeed/encoder_deepspeed_128_experts_4_gpus_0.8_rs_90_cf",
+    "num_experts": 128,
+    "warmup_rounds": 3,
+    "local_rank": 3,
+    "world_size": 4,
+    "capacity_factor": 90.0,
+    "enable_router_skew": true,
+    "router_skew": 0.8,
+    "random_router_skew": false,
+    "model_type": "encoder",
+    "num_experts_skew": 13
+}
