@@ -75,11 +75,6 @@ print(args)
 
 pynvml.nvmlInit()
 
-# Max loaded experts must be greater than or equal to EP size
-if args.max_loaded_experts < math.ceil(args.num_experts / args.world):
-    print("The max loaded experts must be greater than the expert parallel size")
-    exit(1)
-
 if args.num_experts not in [8, 16, 32, 64, 128, 256]:
     print(f"There is no model with {args.num_experts} experts")
     exit(1)
@@ -88,8 +83,13 @@ if args.num_iters == 0 and args.num_samples == 0:
     print("You must either specify --num_iters or --num_samples")
     exit(1)
 
-if args.expert_manager == "sliced_fused_kernel" and args.num_parallel_experts_per_GPU > 1:
+if args.num_parallel_experts_per_GPU == 0 and args.expert_manager == "Sliced":
+    print("Number of parallel experts per GPU needs to be at least 1")
+    exit(1)
+
+if args.expert_manager == "MegaBlocks" and args.num_parallel_experts_per_GPU > 1:
     print("MegaBlocks does not support multiple parallel experts per GPU, ignoring --num_parallel_experts_per_GPU")
+
 
 if args.num_iters != 0:
     DESIRED_DATASET_SIZE = args.num_iters * args.batch_size * args.world
@@ -179,13 +179,10 @@ def run_inference_workload(rank):
 
         config = MoELayerConfig(
             expert_manager=args.expert_manager,
-            enable_rebalancing=args.enable_rebalancing,
-            max_loaded_experts=args.max_loaded_experts,
             num_experts=args.num_experts,
             num_parallel_experts_per_GPU=args.num_parallel_experts_per_GPU,
             profile=args.profile,
             nv_profile=args.nvidia_profile,
-            scheduling_policy=args.schedule,        
             enable_router_skew=args.enable_router_skew,
             router_skew=args.router_skew,
             random_router_skew=args.random_router_skew,

@@ -38,7 +38,7 @@ class MoELayerConfig(PretrainedConfig):
         pad_token_id=0,
         eos_token_id=1,
         router_class=SwitchTransformersTop1Router,
-        expert_manager="manual_sliced",
+        expert_manager="Sliced",
         num_parallel_experts_per_GPU=0,
         profile=False,
         nv_profile=False,
