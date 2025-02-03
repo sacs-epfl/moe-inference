@@ -10,12 +10,12 @@ python3 start.py \
     --num_iters 100 \
     --profile False \
     --nvidia_profile False \
-    --world 4 \
+    --world 1 \
     --dataset "bookcorpus" \
     --enable_router_skew False \
     --router_skew 0.6 \
     --num_experts_skew 2 \
     --expert_manager "MegaBlocks" \
-    --path "../outputs/mgblcks/encoder-decoder_mgblcks_128_experts_4_gpus_normalrun_ec_50" \
+    --path "../outputs/mgblcks/encoder-decoder_mgblcks_128_experts_1_gpus_normalrun_get_tokens_per_exp" \
     --label "Encoder-Decoder MegaBlocks 128 Experts" \
-    --experiment_name "encoder-decoder_mgblcks_128_experts_4_gpus_normalrun_ec_50"
+    --experiment_name "encoder-decoder_mgblcks_128_experts_4_gpus_normalrun"

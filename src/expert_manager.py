@@ -98,6 +98,7 @@ class ExpertManager(ABC, nn.Module):
         self.tot_num_bytes_sent = []
         self.tot_num_bytes_recv = []
         self.e2e_layer_time = []
+        self.num_tokens_per_expert = [[] for _ in range(config.num_experts)]
 
         self.start_timers = defaultdict(lambda: torch.cuda.Event(enable_timing=True)) if config.profile else None
         self.end_timers = defaultdict(lambda: torch.cuda.Event(enable_timing=True)) if config.profile else None

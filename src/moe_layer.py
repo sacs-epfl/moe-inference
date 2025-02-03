@@ -108,6 +108,10 @@ class MoELayer(nn.Module):
         experts_inputs = [hidden_states[router_mask[:,:,idx]] for idx in range(num_experts)]
         self.expert_manager.maybe_nv_range_pop()
 
+        for i in range(self.num_experts):
+            self.expert_manager.num_tokens_per_expert[i].append(experts_inputs[i].shape[0])
+
+
         # I (GPU x) send to GPU y the chunk (along the features dim) that GPU y needs to process, not the whole tensor
         # This way, I only send to each GPU the bare minimum of data that it needs to process
         # The alternative would be to send all of my shard of the data and then each GPU selects the chunk it needs
@@ -264,7 +268,7 @@ class MoELayer(nn.Module):
             path += "_decode"
 
         with open(f"{path}.csv", "w") as f:
-            fieldnames = ["iteration", "latency (ms)", "total number of bytes sent", "total number of bytes recv"]
+            fieldnames = ["iteration", "latency (ms)", "total number of bytes sent", "total number of bytes recv", "tokens per expert"]
 
             if self.expert_manager.profile:
                 fieldnames += list(self.expert_manager.get_timer_names())
@@ -272,12 +276,13 @@ class MoELayer(nn.Module):
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writeheader()
 
-            for i in range(len(self.expert_manager.tot_num_bytes_sent[warmup:])):
+            for i in range(warmup, len(self.expert_manager.tot_num_bytes_sent)):
                 dic = {
                     "iteration": i,
                     "latency (ms)": self.expert_manager.e2e_layer_time[i],
                     "total number of bytes sent": self.expert_manager.tot_num_bytes_sent[i],
-                    "total number of bytes recv": self.expert_manager.tot_num_bytes_recv[i]
+                    "total number of bytes recv": self.expert_manager.tot_num_bytes_recv[i],
+                    "tokens per expert": [self.expert_manager.num_tokens_per_expert[e][i] for e in range(self.num_experts)]
                 }
 
                 if self.expert_manager.profile:
