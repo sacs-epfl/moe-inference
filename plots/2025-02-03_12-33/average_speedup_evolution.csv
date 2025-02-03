@@ -1,0 +1,25 @@
+model,model_type,Batch Size,speedup
+DeepSpeed,Encoder,10,1.0
+DeepSpeed,Encoder,100,1.0
+DeepSpeed,Encoder,250,1.0
+DeepSpeed,Encoder,450,1.0
+DeepSpeed,Encoder-Decoder,10,1.0
+DeepSpeed,Encoder-Decoder,100,1.0
+DeepSpeed,Encoder-Decoder,250,1.0
+DeepSpeed,Encoder-Decoder,450,1.0
+MegaBlocks,Encoder,10,0.27
+MegaBlocks,Encoder,100,2.01
+MegaBlocks,Encoder,250,4.06
+MegaBlocks,Encoder,450,6.24
+MegaBlocks,Encoder-Decoder,10,0.22
+MegaBlocks,Encoder-Decoder,100,1.05
+MegaBlocks,Encoder-Decoder,250,2.1
+MegaBlocks,Encoder-Decoder,450,3.18
+Sliced,Encoder,10,0.24
+Sliced,Encoder,100,1.58
+Sliced,Encoder,250,3.46
+Sliced,Encoder,450,5.91
+Sliced,Encoder-Decoder,10,0.19
+Sliced,Encoder-Decoder,100,0.89
+Sliced,Encoder-Decoder,250,1.84
+Sliced,Encoder-Decoder,450,2.9

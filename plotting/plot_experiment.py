@@ -233,9 +233,9 @@ def plot_average_speedup_evolution(dirs, evolution_type, evolution_label):
 def model_mapping(label):
     if "DeepSpeed" in label:
         return "DeepSpeed"
-    elif "Sliced" in label:
+    elif "Sliced" in label or "manual_sliced" in label:
         return "Sliced"
-    elif "MegaBlocks" in label:
+    elif "MegaBlocks" in label or "sliced_fused_kernel" in label:
         return "MegaBlocks"
     
     else:
@@ -298,7 +298,7 @@ def plot_average_speedup_evolution_2(dirs, evolution_type, evolution_label):
         return
     frames = pd.concat(frames, axis=0, ignore_index=True)
 
-    speedups = pd.DataFrame(columns=["model", "model_type", evolution_label, "layer", "speedup"]) 
+    speedups = []
 
     frames = frames.groupby(["model_type", "layer", evolution_label])
 
@@ -342,8 +342,9 @@ def plot_average_speedup_evolution_2(dirs, evolution_type, evolution_label):
             "speedup": sliced_speedup,
             "layer": layer
         }])
-
-        speedups = pd.concat([speedups, new_speedups], axis=0, ignore_index=True)
+        speedups.append(new_speedups)
+    
+    speedups = pd.concat(speedups, axis=0, ignore_index=True)
 
     avg_speedups = speedups.groupby(["model", "model_type", evolution_label])["speedup"].mean().reset_index()
     avg_speedups["speedup"] = avg_speedups["speedup"].round(2)
@@ -367,6 +368,8 @@ def plot_average_speedup_evolution_2(dirs, evolution_type, evolution_label):
 
     create_dir_if_needed()
     fig.write_image(f"{OUTPUT_DIR}/average_speedup_evolution.pdf", format="pdf")
+    avg_speedups[evolution_label] = avg_speedups[evolution_label].astype(int)
+    avg_speedups.to_csv(f"{OUTPUT_DIR}/average_speedup_evolution.csv", index=False)
 
 
 def save_merge_csv_evolution(dirs, evolution_type, evolution_label):
@@ -683,6 +686,7 @@ def plot_section_time_by_GPU(dirs: List[str]):
     fig.show()
     create_dir_if_needed()
     fig.write_image(f"{OUTPUT_DIR}/section_time_mean_std-per_GPU.pdf", format="pdf")
+    total_df.to_csv(f"{OUTPUT_DIR}/section_time_mean_std-per_GPU.csv", index=False)
 
 
 def plot_e2e_per_layer(dirs: [str]):
@@ -799,6 +803,33 @@ def plot_average_time_per_component(dirs: List[str]):
     plot_avg(final_df, "Average time per component", "_profiling_avg_time.png")
 
 
+def plot_imbalance(_dir: str):
+    def get_cv(x):
+        return np.std(x, axis=0) / np.mean(x, axis=0)
+
+    data_dir = os.path.join(_dir, "0")
+    final_df = []
+    for layer in list_files(data_dir):
+        if layer == "e2e.csv" or layer.endswith("_decode.csv"):
+            continue
+        df = pd.read_csv(os.path.join(data_dir, layer))
+        df = df[df["iteration"] > 3]
+        df = df[["iteration", "tokens per expert"]]
+        df["tokens per expert"] = df["tokens per expert"].apply(ast.literal_eval)
+        df["layer"] = layer.split(".")[0]
+        df["cv"] = df["tokens per expert"].apply(get_cv)
+        max_cv_per_layer_rows = df[df["cv"] == df["cv"].max()].copy()
+        min_cv_per_layer_rows = df[df["cv"] == df["cv"].min()].copy()
+        max_cv_per_layer_rows["type"] = "max"
+        min_cv_per_layer_rows["type"] = "min"
+        final_df.append(max_cv_per_layer_rows)
+        final_df.append(min_cv_per_layer_rows)
+    
+    final_df = pd.concat(final_df, axis=0, ignore_index=True)
+    create_dir_if_needed()
+    final_df.to_csv(f"{OUTPUT_DIR}/imbalance.csv", index=False)
+
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-t", "--type", default="average_speedup", type=str)
@@ -837,6 +868,11 @@ elif plotting_type == "save_merge_csv-e2e":
 elif plotting_type == "save_merge_csv-time-section":
     rest = args.rest.split(" ")
     save_merge_csv_time_section(rest)
+elif plotting_type == "plot-imbalance":
+    rest = args.rest.split(" ")
+    rest = [r for r in rest if r != ""]
+    assert len(rest) == 1, "Only 1 directory is allowed for plotting imbalance"
+    plot_imbalance(rest[0])
 
 else:
     print("No plotting type of that name")
