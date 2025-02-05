@@ -2,9 +2,19 @@ from enum import Enum
 import torch
 import torch.nn as nn
 import torch.distributed as dist
+import os
+from constants import DEFAULT_CACHE_DIR, DEBUG
 
-# set to True to enable debug print statements
-DEBUG=False
+def str2bool(s):
+    return s.lower() in ["yes", "y", "true", "t"]
+
+def get_cache():
+    if "CACHE" in os.environ:
+        return os.environ["CACHE"]
+    else:
+        print("Cache directory not set, using default ", DEFAULT_CACHE_DIR)
+        return DEFAULT_CACHE_DIR
+
 def debug(text, rank=0):
     if DEBUG and dist.get_rank() == rank:
         print(f"[DEBUG][{rank}] - ",text)

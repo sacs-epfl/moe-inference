@@ -31,15 +31,11 @@ import warnings
 from moe_layer_config import MoELayerConfig
 from moe_layer import MoELayer
 from setup_layers import replace_switch_moe_layer, parallelize_experts, save_latencies
-from utils import debug
+from utils import debug, get_cache, str2bool
 import pandas as pd
 
 
 logging.set_verbosity_error()
-
-
-def str2bool(s):
-    return s.lower() in ["yes", "y", "true", "t"]
 
 # Argparse
 parser = argparse.ArgumentParser(
@@ -97,14 +93,6 @@ else:
     DESIRED_DATASET_SIZE = args.num_samples
 
 ROOT = f"{args.path}"
-
-DEFAULT_CACHE_DIR = "/cache"
-def get_cache():
-    if "CACHE" in os.environ:
-        return os.environ["CACHE"]
-    else:
-        print("Cache directory not set, using default ", DEFAULT_CACHE_DIR)
-        return DEFAULT_CACHE_DIR
 
 def setup(rank):
     os.environ["MASTER_ADDR"] = "localhost"
